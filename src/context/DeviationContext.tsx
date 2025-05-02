@@ -71,7 +71,7 @@ export const DeviationProvider: React.FC<{ children: React.ReactNode }> = ({ chi
           if (approver.id === approverId) {
             return {
               ...approver,
-              status: "approved",
+              status: "approved" as const,
               comments: comments || "",
               timestamp: new Date().toISOString(),
             };
@@ -113,7 +113,7 @@ export const DeviationProvider: React.FC<{ children: React.ReactNode }> = ({ chi
           if (approver.id === approverId) {
             return {
               ...approver,
-              status: "rejected",
+              status: "rejected" as const,
               comments,
               timestamp: new Date().toISOString(),
             };

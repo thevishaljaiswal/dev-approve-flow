@@ -1,5 +1,5 @@
 
-import { DeviationRequest, DeviationType } from "@/types";
+import { DeviationRequest, DeviationType, RequestStatus } from "@/types";
 
 const deviationTypes: DeviationType[] = [
   "registration",
@@ -18,7 +18,7 @@ const generateApprovers = (type: DeviationType) => {
       id: "a1",
       name: "Rahul Mehta",
       role: "CRM Manager",
-      status: "approved",
+      status: "approved" as const,
       comments: "Approved based on customer's good payment history",
       timestamp: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
     },
@@ -32,15 +32,17 @@ const generateApprovers = (type: DeviationType) => {
           id: "a2",
           name: "Neha Sharma",
           role: "Legal Head",
-          status: "pending",
+          status: "pending" as const,
           comments: "",
+          timestamp: "",
         },
         {
           id: "a3",
           name: "Vikram Singh",
           role: "Director",
-          status: "pending",
+          status: "pending" as const,
           comments: "",
+          timestamp: "",
         }
       );
       break;
@@ -50,15 +52,17 @@ const generateApprovers = (type: DeviationType) => {
           id: "a4",
           name: "Amit Patel",
           role: "Projects Head",
-          status: "pending",
+          status: "pending" as const,
           comments: "",
+          timestamp: "",
         },
         {
           id: "a5",
           name: "Priya Gupta",
           role: "Finance",
-          status: "pending",
+          status: "pending" as const,
           comments: "",
+          timestamp: "",
         }
       );
       break;
@@ -68,15 +72,17 @@ const generateApprovers = (type: DeviationType) => {
           id: "a6",
           name: "Deepak Joshi",
           role: "Finance Head",
-          status: "pending",
+          status: "pending" as const,
           comments: "",
+          timestamp: "",
         },
         {
           id: "a7",
           name: "Vijay Kumar",
           role: "COO",
-          status: "pending",
+          status: "pending" as const,
           comments: "",
+          timestamp: "",
         }
       );
       break;
@@ -86,15 +92,17 @@ const generateApprovers = (type: DeviationType) => {
           id: "a8",
           name: "Ankur Verma",
           role: "Sales Head",
-          status: "pending",
+          status: "pending" as const,
           comments: "",
+          timestamp: "",
         },
         {
           id: "a9",
           name: "Meera Iyer",
           role: "Finance",
-          status: "pending",
+          status: "pending" as const,
           comments: "",
+          timestamp: "",
         }
       );
       break;
@@ -104,15 +112,17 @@ const generateApprovers = (type: DeviationType) => {
           id: "a10",
           name: "Sanjay Kapoor",
           role: "Finance",
-          status: "pending",
+          status: "pending" as const,
           comments: "",
+          timestamp: "",
         },
         {
           id: "a11",
           name: "Ritika Singhania",
           role: "Legal",
-          status: "pending",
+          status: "pending" as const,
           comments: "",
+          timestamp: "",
         }
       );
       break;
@@ -122,22 +132,25 @@ const generateApprovers = (type: DeviationType) => {
           id: "a12",
           name: "Anil Kumar",
           role: "CRM Head",
-          status: "pending",
+          status: "pending" as const,
           comments: "",
+          timestamp: "",
         },
         {
           id: "a13",
           name: "Gautam Reddy",
           role: "Finance",
-          status: "pending",
+          status: "pending" as const,
           comments: "",
+          timestamp: "",
         },
         {
           id: "a14",
           name: "Kavita Singh",
           role: "CEO",
-          status: "pending",
+          status: "pending" as const,
           comments: "",
+          timestamp: "",
         }
       );
       break;
@@ -259,7 +272,7 @@ export const generateMockData = (): DeviationRequest[] => {
 
   for (let i = 0; i < 15; i++) {
     const type = deviationTypes[i % deviationTypes.length];
-    const status = statuses[Math.floor(Math.random() * statuses.length)];
+    const status = statuses[Math.floor(Math.random() * statuses.length)] as RequestStatus;
     const createdAt = new Date(Date.now() - i * 24 * 60 * 60 * 1000).toISOString();
     const updatedAt = new Date(Date.now() - i * 12 * 60 * 60 * 1000).toISOString();
     
@@ -274,7 +287,7 @@ export const generateMockData = (): DeviationRequest[] => {
     mockRequests.push({
       id: `REQ-${1000 + i}`,
       type,
-      status: status as RequestStatus,
+      status,
       createdAt,
       createdBy: {
         id: "user1",
@@ -292,4 +305,43 @@ export const generateMockData = (): DeviationRequest[] => {
   }
 
   return mockRequests;
+};
+
+const customerNames = [
+  "Rajesh Kumar",
+  "Preeti Shah",
+  "Abdul Karim",
+  "Lakshmi Nair",
+  "John Smith",
+  "Ananya Malhotra",
+  "Vivek Chauhan",
+  "Leela Krishnan",
+  "Suresh Patel",
+  "Fatima Ahmed",
+];
+
+const getRandomDate = (startDate: Date, endDate: Date) => {
+  const minValue = startDate.getTime();
+  const maxValue = endDate.getTime();
+  const timestamp = Math.floor(Math.random() * (maxValue - minValue + 1) + minValue);
+  return new Date(timestamp).toISOString().split("T")[0];
+};
+
+const getDeviationDescription = (type: DeviationType, data: any) => {
+  switch (type) {
+    case "registration":
+      return `Request to change registration date from ${data.originalRegistrationDate} to ${data.proposedRegistrationDate}`;
+    case "possession":
+      return `Request to change possession date from ${data.originalPossessionDate} to ${data.requestedPossessionDate}`;
+    case "interest_waiver":
+      return `Request for interest waiver of ₹${data.interestWaiverRequested} against charged amount of ₹${data.interestCharged}`;
+    case "cashback":
+      return `Request for additional cashback of ₹${data.requestedCashbackAmount - data.eligibleCashbackAmount} over eligible amount`;
+    case "pre_emi":
+      return `Request for ${data.requestedSupport} due to ${data.issueInRepayment}`;
+    case "cancellation":
+      return `Requesting full refund of ₹${data.refundAmountRequested} against policy amount of ₹${data.refundAmountAsPerPolicy}`;
+    default:
+      return "";
+  }
 };

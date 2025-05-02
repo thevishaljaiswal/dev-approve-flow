@@ -41,7 +41,7 @@ const Sidebar = () => {
   ];
 
   return (
-    <UISidebar defaultCollapsed={false}>
+    <UISidebar>
       <div className="flex h-14 items-center justify-center border-b border-sidebar-border bg-primary">
         <h1 className="text-xl font-bold tracking-tight text-white px-4">DevFlow</h1>
       </div>
