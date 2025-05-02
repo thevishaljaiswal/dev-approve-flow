@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -10,7 +9,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { SidebarTrigger } from "@/components/ui/sidebar";
 
 const Header = () => {
   const [notifications, setNotifications] = useState([
@@ -32,12 +30,7 @@ const Header = () => {
   const unreadCount = notifications.filter(n => n.unread).length;
 
   return (
-    <header className="border-b bg-white px-4 py-3 flex justify-between items-center">
-      <div className="flex items-center gap-2">
-        <SidebarTrigger className="md:hidden" />
-        <h1 className="font-bold text-lg text-primary hidden md:block">Deviation Approval System</h1>
-      </div>
-
+    <header className="bg-white px-4 py-2 flex justify-end items-center">
       <div className="flex items-center gap-3">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
