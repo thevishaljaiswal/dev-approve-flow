@@ -1,5 +1,6 @@
 
 import { DeviationRequest } from "@/types";
+import { Badge } from "@/components/ui/badge";
 
 interface DeviationDetailsProps {
   request: DeviationRequest;
