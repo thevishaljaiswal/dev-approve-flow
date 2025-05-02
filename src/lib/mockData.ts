@@ -1,5 +1,5 @@
 
-import { DeviationRequest, DeviationType, RequestStatus } from "@/types";
+import { DeviationRequest, DeviationType, RequestStatus, Approver } from "@/types";
 
 const deviationTypes: DeviationType[] = [
   "registration",
@@ -10,7 +10,7 @@ const deviationTypes: DeviationType[] = [
   "cancellation",
 ];
 
-const statuses = ["pending", "in_review", "approved", "rejected"];
+const statuses: RequestStatus[] = ["pending", "in_review", "approved", "rejected"];
 
 const customerNames = [
   "Rajesh Kumar",
@@ -25,39 +25,13 @@ const customerNames = [
   "Fatima Ahmed",
 ];
 
-const getRandomDate = (startDate: Date, endDate: Date) => {
-  const minValue = startDate.getTime();
-  const maxValue = endDate.getTime();
-  const timestamp = Math.floor(Math.random() * (maxValue - minValue + 1) + minValue);
-  return new Date(timestamp).toISOString().split("T")[0];
-};
-
-const getDeviationDescription = (type: DeviationType, data: any) => {
-  switch (type) {
-    case "registration":
-      return `Request to change registration date from ${data.originalRegistrationDate} to ${data.proposedRegistrationDate}`;
-    case "possession":
-      return `Request to change possession date from ${data.originalPossessionDate} to ${data.requestedPossessionDate}`;
-    case "interest_waiver":
-      return `Request for interest waiver of ₹${data.interestWaiverRequested} against charged amount of ₹${data.interestCharged}`;
-    case "cashback":
-      return `Request for additional cashback of ₹${data.requestedCashbackAmount - data.eligibleCashbackAmount} over eligible amount`;
-    case "pre_emi":
-      return `Request for ${data.requestedSupport} due to ${data.issueInRepayment}`;
-    case "cancellation":
-      return `Requesting full refund of ₹${data.refundAmountRequested} against policy amount of ₹${data.refundAmountAsPerPolicy}`;
-    default:
-      return "";
-  }
-};
-
-const generateApprovers = (type: DeviationType) => {
-  const approvers = [
+const generateApprovers = (type: DeviationType): Approver[] => {
+  const approvers: Approver[] = [
     {
       id: "a1",
       name: "Rahul Mehta",
       role: "CRM Manager",
-      status: "approved" as const,
+      status: "approved",
       comments: "Approved based on customer's good payment history",
       timestamp: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
     },
@@ -71,7 +45,7 @@ const generateApprovers = (type: DeviationType) => {
           id: "a2",
           name: "Neha Sharma",
           role: "Legal Head",
-          status: "pending" as const,
+          status: "pending",
           comments: "",
           timestamp: "",
         },
@@ -79,7 +53,7 @@ const generateApprovers = (type: DeviationType) => {
           id: "a3",
           name: "Vikram Singh",
           role: "Director",
-          status: "pending" as const,
+          status: "pending",
           comments: "",
           timestamp: "",
         }
@@ -91,7 +65,7 @@ const generateApprovers = (type: DeviationType) => {
           id: "a4",
           name: "Amit Patel",
           role: "Projects Head",
-          status: "pending" as const,
+          status: "pending",
           comments: "",
           timestamp: "",
         },
@@ -99,7 +73,7 @@ const generateApprovers = (type: DeviationType) => {
           id: "a5",
           name: "Priya Gupta",
           role: "Finance",
-          status: "pending" as const,
+          status: "pending",
           comments: "",
           timestamp: "",
         }
@@ -111,7 +85,7 @@ const generateApprovers = (type: DeviationType) => {
           id: "a6",
           name: "Deepak Joshi",
           role: "Finance Head",
-          status: "pending" as const,
+          status: "pending",
           comments: "",
           timestamp: "",
         },
@@ -119,7 +93,7 @@ const generateApprovers = (type: DeviationType) => {
           id: "a7",
           name: "Vijay Kumar",
           role: "COO",
-          status: "pending" as const,
+          status: "pending",
           comments: "",
           timestamp: "",
         }
@@ -131,7 +105,7 @@ const generateApprovers = (type: DeviationType) => {
           id: "a8",
           name: "Ankur Verma",
           role: "Sales Head",
-          status: "pending" as const,
+          status: "pending",
           comments: "",
           timestamp: "",
         },
@@ -139,7 +113,7 @@ const generateApprovers = (type: DeviationType) => {
           id: "a9",
           name: "Meera Iyer",
           role: "Finance",
-          status: "pending" as const,
+          status: "pending",
           comments: "",
           timestamp: "",
         }
@@ -151,7 +125,7 @@ const generateApprovers = (type: DeviationType) => {
           id: "a10",
           name: "Sanjay Kapoor",
           role: "Finance",
-          status: "pending" as const,
+          status: "pending",
           comments: "",
           timestamp: "",
         },
@@ -159,7 +133,7 @@ const generateApprovers = (type: DeviationType) => {
           id: "a11",
           name: "Ritika Singhania",
           role: "Legal",
-          status: "pending" as const,
+          status: "pending",
           comments: "",
           timestamp: "",
         }
@@ -171,7 +145,7 @@ const generateApprovers = (type: DeviationType) => {
           id: "a12",
           name: "Anil Kumar",
           role: "CRM Head",
-          status: "pending" as const,
+          status: "pending",
           comments: "",
           timestamp: "",
         },
@@ -179,7 +153,7 @@ const generateApprovers = (type: DeviationType) => {
           id: "a13",
           name: "Gautam Reddy",
           role: "Finance",
-          status: "pending" as const,
+          status: "pending",
           comments: "",
           timestamp: "",
         },
@@ -187,7 +161,7 @@ const generateApprovers = (type: DeviationType) => {
           id: "a14",
           name: "Kavita Singh",
           role: "CEO",
-          status: "pending" as const,
+          status: "pending",
           comments: "",
           timestamp: "",
         }
@@ -198,6 +172,13 @@ const generateApprovers = (type: DeviationType) => {
   }
 
   return approvers;
+};
+
+const getRandomDate = (startDate: Date, endDate: Date) => {
+  const minValue = startDate.getTime();
+  const maxValue = endDate.getTime();
+  const timestamp = Math.floor(Math.random() * (maxValue - minValue + 1) + minValue);
+  return new Date(timestamp).toISOString().split("T")[0];
 };
 
 const getTypeSpecificData = (type: DeviationType, index: number) => {
@@ -267,20 +248,44 @@ const getTypeSpecificData = (type: DeviationType, index: number) => {
   }
 };
 
+const getDeviationDescription = (type: DeviationType, data: any) => {
+  switch (type) {
+    case "registration":
+      return `Request to change registration date from ${data.originalRegistrationDate} to ${data.proposedRegistrationDate}`;
+    case "possession":
+      return `Request to change possession date from ${data.originalPossessionDate} to ${data.requestedPossessionDate}`;
+    case "interest_waiver":
+      return `Request for interest waiver of ₹${data.interestWaiverRequested} against charged amount of ₹${data.interestCharged}`;
+    case "cashback":
+      return `Request for additional cashback of ₹${data.requestedCashbackAmount - data.eligibleCashbackAmount} over eligible amount`;
+    case "pre_emi":
+      return `Request for ${data.requestedSupport} due to ${data.issueInRepayment}`;
+    case "cancellation":
+      return `Requesting full refund of ₹${data.refundAmountRequested} against policy amount of ₹${data.refundAmountAsPerPolicy}`;
+    default:
+      return "";
+  }
+};
+
 export const generateMockData = (): DeviationRequest[] => {
   const mockRequests: DeviationRequest[] = [];
 
   for (let i = 0; i < 15; i++) {
     const type = deviationTypes[i % deviationTypes.length];
-    const status = statuses[Math.floor(Math.random() * statuses.length)] as RequestStatus;
+    const status = statuses[Math.floor(Math.random() * statuses.length)];
     const createdAt = new Date(Date.now() - i * 24 * 60 * 60 * 1000).toISOString();
     const updatedAt = new Date(Date.now() - i * 12 * 60 * 60 * 1000).toISOString();
     
     const approvers = generateApprovers(type);
-    // Fix the comparison for rejected status by using type check instead of value equality
-    const currentLevel = status === "approved" ? approvers.length : 
-                         status === "rejected" ? 
-                         (approvers.findIndex(a => a.status === "rejected") + 1) || 1 : 1;
+    
+    // Fix the comparison logic to use strict equality and proper type checking
+    let currentLevel = 1;
+    if (status === "approved") {
+      currentLevel = approvers.length;
+    } else if (status === "rejected") {
+      const rejectedIndex = approvers.findIndex(a => a.status === "rejected");
+      currentLevel = rejectedIndex !== -1 ? rejectedIndex + 1 : 1;
+    }
     
     const customerName = customerNames[i % customerNames.length];
     const unitNumber = `A-${100 + i}`;
