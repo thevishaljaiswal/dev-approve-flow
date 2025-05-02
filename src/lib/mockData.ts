@@ -26,21 +26,20 @@ const customerNames = [
 ];
 
 const generateApprovers = (type: DeviationType): Approver[] => {
-  const approvers: Approver[] = [
-    {
-      id: "a1",
-      name: "Rahul Mehta",
-      role: "CRM Manager",
-      status: "approved",
-      comments: "Approved based on customer's good payment history",
-      timestamp: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
-    },
-  ];
+  const approvers: Approver[] = [];
 
   // Add different approvers based on deviation type
   switch (type) {
     case "registration":
       approvers.push(
+        {
+          id: "a1",
+          name: "Rahul Mehta",
+          role: "CRM Manager",
+          status: "pending",
+          comments: "",
+          timestamp: "",
+        },
         {
           id: "a2",
           name: "Neha Sharma",
@@ -62,6 +61,14 @@ const generateApprovers = (type: DeviationType): Approver[] => {
     case "possession":
       approvers.push(
         {
+          id: "a1",
+          name: "Rahul Mehta",
+          role: "CRM Manager",
+          status: "pending",
+          comments: "",
+          timestamp: "",
+        },
+        {
           id: "a4",
           name: "Amit Patel",
           role: "Projects Head",
@@ -81,6 +88,14 @@ const generateApprovers = (type: DeviationType): Approver[] => {
       break;
     case "interest_waiver":
       approvers.push(
+        {
+          id: "a1",
+          name: "Rahul Mehta",
+          role: "CRM Manager",
+          status: "pending",
+          comments: "",
+          timestamp: "",
+        },
         {
           id: "a6",
           name: "Deepak Joshi",
@@ -102,6 +117,14 @@ const generateApprovers = (type: DeviationType): Approver[] => {
     case "cashback":
       approvers.push(
         {
+          id: "a1",
+          name: "Rahul Mehta",
+          role: "CRM Manager",
+          status: "pending",
+          comments: "",
+          timestamp: "",
+        },
+        {
           id: "a8",
           name: "Ankur Verma",
           role: "Sales Head",
@@ -122,6 +145,14 @@ const generateApprovers = (type: DeviationType): Approver[] => {
     case "pre_emi":
       approvers.push(
         {
+          id: "a1",
+          name: "Rahul Mehta",
+          role: "CRM Manager",
+          status: "pending",
+          comments: "",
+          timestamp: "",
+        },
+        {
           id: "a10",
           name: "Sanjay Kapoor",
           role: "Finance",
@@ -141,6 +172,14 @@ const generateApprovers = (type: DeviationType): Approver[] => {
       break;
     case "cancellation":
       approvers.push(
+        {
+          id: "a1",
+          name: "Rahul Mehta",
+          role: "CRM Manager",
+          status: "pending",
+          comments: "",
+          timestamp: "",
+        },
         {
           id: "a12",
           name: "Anil Kumar",
@@ -270,25 +309,17 @@ const getDeviationDescription = (type: DeviationType, data: any) => {
 export const generateMockData = (): DeviationRequest[] => {
   const mockRequests: DeviationRequest[] = [];
 
-  for (let i = 0; i < 15; i++) {
-    const type = deviationTypes[i % deviationTypes.length];
-    const status = statuses[Math.floor(Math.random() * statuses.length)];
+  // Create one request for each deviation type
+  for (let i = 0; i < deviationTypes.length; i++) {
+    const type = deviationTypes[i];
+    const customerName = customerNames[i % customerNames.length];
+    const unitNumber = `A-${100 + i}`;
     const createdAt = new Date(Date.now() - i * 24 * 60 * 60 * 1000).toISOString();
     const updatedAt = new Date(Date.now() - i * 12 * 60 * 60 * 1000).toISOString();
     
     const approvers = generateApprovers(type);
-    
-    // Fix the comparison logic to use strict equality and proper type checking
-    let currentLevel = 1;
-    if (status === "approved") {
-      currentLevel = approvers.length;
-    } else if (status === "rejected") {
-      const rejectedIndex = approvers.findIndex(a => a.status === "rejected");
-      currentLevel = rejectedIndex !== -1 ? rejectedIndex + 1 : 1;
-    }
-    
-    const customerName = customerNames[i % customerNames.length];
-    const unitNumber = `A-${100 + i}`;
+    const currentLevel = 1; // All requests at first approval level
+    const status = "pending";
     
     const typeSpecificData = getTypeSpecificData(type, i);
     
@@ -301,6 +332,58 @@ export const generateMockData = (): DeviationRequest[] => {
         id: "user1",
         name: "Rahul Mehta",
         role: "CRM Manager",
+      },
+      updatedAt,
+      approvers,
+      customerName,
+      unitNumber,
+      currentLevel,
+      description: getDeviationDescription(type, typeSpecificData),
+      ...typeSpecificData,
+    });
+  }
+
+  // Create additional requests with different levels/statuses
+  for (let i = 0; i < 9; i++) {
+    const index = i % deviationTypes.length;
+    const type = deviationTypes[index];
+    const status = i < 3 ? "pending" : i < 6 ? "in_review" : "approved";
+    const createdAt = new Date(Date.now() - (i + 6) * 24 * 60 * 60 * 1000).toISOString();
+    const updatedAt = new Date(Date.now() - (i + 6) * 12 * 60 * 60 * 1000).toISOString();
+    
+    const approvers = generateApprovers(type);
+    
+    // Set different approval statuses
+    if (i >= 3) {
+      approvers[0].status = "approved";
+      approvers[0].comments = "Approved after careful review";
+      approvers[0].timestamp = new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString();
+    }
+    
+    if (i >= 6) {
+      approvers[1].status = "approved";
+      approvers[1].comments = "Approved with conditions";
+      approvers[1].timestamp = new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString();
+    }
+    
+    let currentLevel = 1;
+    if (i >= 3) currentLevel = 2;
+    if (i >= 6) currentLevel = 3;
+    
+    const customerName = customerNames[(i + 6) % customerNames.length];
+    const unitNumber = `B-${200 + i}`;
+    
+    const typeSpecificData = getTypeSpecificData(type, i + 6);
+    
+    mockRequests.push({
+      id: `REQ-${2000 + i}`,
+      type,
+      status,
+      createdAt,
+      createdBy: {
+        id: "user2",
+        name: "Arjun Singh",
+        role: "Sales Executive",
       },
       updatedAt,
       approvers,

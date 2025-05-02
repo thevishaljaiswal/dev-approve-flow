@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useDeviations } from "@/context/DeviationContext";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -7,9 +7,10 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
 import { Check, X, Eye } from "lucide-react";
-import { DeviationRequest } from "@/types";
+import { DeviationRequest, DeviationType } from "@/types";
 import { useToast } from "@/hooks/use-toast";
 import DeviationDetails from "@/components/DeviationDetails";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const Approvals = () => {
   const { getPendingApprovals, approveRequest, rejectRequest } = useDeviations();
@@ -18,6 +19,7 @@ const Approvals = () => {
   const [rejectionReason, setRejectionReason] = useState<string>("");
   const [isDetailsOpen, setIsDetailsOpen] = useState<boolean>(false);
   const [isRejectDialogOpen, setIsRejectDialogOpen] = useState<boolean>(false);
+  const [activeTab, setActiveTab] = useState<string>("all");
   
   // For demo purposes, we'll use a fixed approver ID
   // In a real application, this would come from authentication
@@ -74,70 +76,101 @@ const Approvals = () => {
     return type.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
   };
 
+  const filteredApprovals = activeTab === "all" 
+    ? pendingApprovals 
+    : pendingApprovals.filter(req => req.type === activeTab);
+
+  const countByType = (type: DeviationType | 'all') => {
+    return type === 'all' 
+      ? pendingApprovals.length 
+      : pendingApprovals.filter(req => req.type === type).length;
+  };
+
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold tracking-tight">Pending Approvals</h1>
+      <div className="flex items-center justify-between">
+        <h1 className="text-2xl font-bold tracking-tight">Pending Approvals</h1>
+        <Badge variant="outline" className="px-3 py-1">
+          {currentApproverName} ({pendingApprovals.length} pending)
+        </Badge>
+      </div>
       
-      {pendingApprovals.length === 0 ? (
-        <Card>
-          <CardContent className="pt-6">
-            <p className="text-center text-muted-foreground">You have no requests pending for approval.</p>
-          </CardContent>
-        </Card>
-      ) : (
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {pendingApprovals.map(request => (
-            <Card key={request.id} className="overflow-hidden">
-              <CardHeader className="pb-3">
-                <div className="flex justify-between items-start">
-                  <Badge variant="outline">{getDeviationTypeDisplayName(request.type)}</Badge>
-                  <Badge className="bg-amber-100 text-amber-800 border-amber-300">
-                    Level {request.currentLevel}
-                  </Badge>
-                </div>
-                <CardTitle className="text-lg mt-2">{request.customerName}</CardTitle>
-                <CardDescription>{request.unitNumber}</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <p className="text-sm mb-4 text-muted-foreground line-clamp-2">
-                  {request.description}
+      <Tabs defaultValue="all" value={activeTab} onValueChange={setActiveTab}>
+        <TabsList className="mb-4">
+          <TabsTrigger value="all">All ({countByType('all')})</TabsTrigger>
+          <TabsTrigger value="registration">Registration ({countByType('registration')})</TabsTrigger>
+          <TabsTrigger value="possession">Possession ({countByType('possession')})</TabsTrigger>
+          <TabsTrigger value="interest_waiver">Interest Waiver ({countByType('interest_waiver')})</TabsTrigger>
+          <TabsTrigger value="cashback">Cashback ({countByType('cashback')})</TabsTrigger>
+          <TabsTrigger value="pre_emi">Pre-EMI ({countByType('pre_emi')})</TabsTrigger>
+          <TabsTrigger value="cancellation">Cancellation ({countByType('cancellation')})</TabsTrigger>
+        </TabsList>
+        
+        <TabsContent value={activeTab}>
+          {filteredApprovals.length === 0 ? (
+            <Card>
+              <CardContent className="pt-6">
+                <p className="text-center text-muted-foreground">
+                  You have no {activeTab !== 'all' ? getDeviationTypeDisplayName(activeTab) : ''} requests pending for approval.
                 </p>
-                <div className="flex flex-col space-y-2">
-                  <Button 
-                    variant="outline" 
-                    className="w-full flex justify-center items-center gap-2"
-                    onClick={() => openDetails(request)}
-                  >
-                    <Eye size={16} />
-                    View Details
-                  </Button>
-                  <div className="flex gap-2">
-                    <Button 
-                      variant="default" 
-                      className="flex-1 bg-green-600 hover:bg-green-700"
-                      onClick={() => {
-                        setSelectedRequest(request);
-                        handleApprove();
-                      }}
-                    >
-                      <Check size={16} className="mr-2" />
-                      Approve
-                    </Button>
-                    <Button 
-                      variant="destructive" 
-                      className="flex-1"
-                      onClick={() => openRejectDialog(request)}
-                    >
-                      <X size={16} className="mr-2" />
-                      Reject
-                    </Button>
-                  </div>
-                </div>
               </CardContent>
             </Card>
-          ))}
-        </div>
-      )}
+          ) : (
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+              {filteredApprovals.map(request => (
+                <Card key={request.id} className="overflow-hidden">
+                  <CardHeader className="pb-3">
+                    <div className="flex justify-between items-start">
+                      <Badge variant="outline">{getDeviationTypeDisplayName(request.type)}</Badge>
+                      <Badge className="bg-amber-100 text-amber-800 border-amber-300">
+                        Level {request.currentLevel}
+                      </Badge>
+                    </div>
+                    <CardTitle className="text-lg mt-2">{request.customerName}</CardTitle>
+                    <CardDescription>{request.unitNumber}</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-sm mb-4 text-muted-foreground line-clamp-2">
+                      {request.description}
+                    </p>
+                    <div className="flex flex-col space-y-2">
+                      <Button 
+                        variant="outline" 
+                        className="w-full flex justify-center items-center gap-2"
+                        onClick={() => openDetails(request)}
+                      >
+                        <Eye size={16} />
+                        View Details
+                      </Button>
+                      <div className="flex gap-2">
+                        <Button 
+                          variant="default" 
+                          className="flex-1 bg-green-600 hover:bg-green-700"
+                          onClick={() => {
+                            setSelectedRequest(request);
+                            handleApprove();
+                          }}
+                        >
+                          <Check size={16} className="mr-2" />
+                          Approve
+                        </Button>
+                        <Button 
+                          variant="destructive" 
+                          className="flex-1"
+                          onClick={() => openRejectDialog(request)}
+                        >
+                          <X size={16} className="mr-2" />
+                          Reject
+                        </Button>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          )}
+        </TabsContent>
+      </Tabs>
 
       {/* Details Dialog */}
       <Dialog open={isDetailsOpen} onOpenChange={setIsDetailsOpen}>
