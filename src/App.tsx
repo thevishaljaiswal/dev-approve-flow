@@ -8,6 +8,7 @@ import Layout from "./components/Layout";
 import Dashboard from "./pages/Dashboard";
 import MyRequests from "./pages/MyRequests";
 import NewRequest from "./pages/NewRequest";
+import Approvals from "./pages/Approvals";
 import NotFound from "./pages/NotFound";
 import { DeviationProvider } from "./context/DeviationContext";
 
@@ -34,6 +35,11 @@ const App = () => (
             <Route path="/new" element={
               <Layout>
                 <NewRequest />
+              </Layout>
+            } />
+            <Route path="/approvals" element={
+              <Layout>
+                <Approvals />
               </Layout>
             } />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

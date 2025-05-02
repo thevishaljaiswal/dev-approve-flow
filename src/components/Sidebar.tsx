@@ -1,6 +1,6 @@
 
 import { Link, useLocation } from "react-router-dom";
-import { FilePenLine, FileText, Home, FileUp } from "lucide-react";
+import { FilePenLine, FileText, Home, FileUp, CheckSquare } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import {
@@ -28,6 +28,7 @@ const Sidebar = () => {
     { path: "/", name: "Dashboard", icon: Home },
     { path: "/requests", name: "My Requests", icon: FileText },
     { path: "/new", name: "New Request", icon: FileUp },
+    { path: "/approvals", name: "Approvals", icon: CheckSquare },
   ];
 
   return (
