@@ -12,6 +12,45 @@ const deviationTypes: DeviationType[] = [
 
 const statuses = ["pending", "in_review", "approved", "rejected"];
 
+const customerNames = [
+  "Rajesh Kumar",
+  "Preeti Shah",
+  "Abdul Karim",
+  "Lakshmi Nair",
+  "John Smith",
+  "Ananya Malhotra",
+  "Vivek Chauhan",
+  "Leela Krishnan",
+  "Suresh Patel",
+  "Fatima Ahmed",
+];
+
+const getRandomDate = (startDate: Date, endDate: Date) => {
+  const minValue = startDate.getTime();
+  const maxValue = endDate.getTime();
+  const timestamp = Math.floor(Math.random() * (maxValue - minValue + 1) + minValue);
+  return new Date(timestamp).toISOString().split("T")[0];
+};
+
+const getDeviationDescription = (type: DeviationType, data: any) => {
+  switch (type) {
+    case "registration":
+      return `Request to change registration date from ${data.originalRegistrationDate} to ${data.proposedRegistrationDate}`;
+    case "possession":
+      return `Request to change possession date from ${data.originalPossessionDate} to ${data.requestedPossessionDate}`;
+    case "interest_waiver":
+      return `Request for interest waiver of ₹${data.interestWaiverRequested} against charged amount of ₹${data.interestCharged}`;
+    case "cashback":
+      return `Request for additional cashback of ₹${data.requestedCashbackAmount - data.eligibleCashbackAmount} over eligible amount`;
+    case "pre_emi":
+      return `Request for ${data.requestedSupport} due to ${data.issueInRepayment}`;
+    case "cancellation":
+      return `Requesting full refund of ₹${data.refundAmountRequested} against policy amount of ₹${data.refundAmountAsPerPolicy}`;
+    default:
+      return "";
+  }
+};
+
 const generateApprovers = (type: DeviationType) => {
   const approvers = [
     {
@@ -161,26 +200,6 @@ const generateApprovers = (type: DeviationType) => {
   return approvers;
 };
 
-const customerNames = [
-  "Rajesh Kumar",
-  "Preeti Shah",
-  "Abdul Karim",
-  "Lakshmi Nair",
-  "John Smith",
-  "Ananya Malhotra",
-  "Vivek Chauhan",
-  "Leela Krishnan",
-  "Suresh Patel",
-  "Fatima Ahmed",
-];
-
-const getRandomDate = (startDate: Date, endDate: Date) => {
-  const minValue = startDate.getTime();
-  const maxValue = endDate.getTime();
-  const timestamp = Math.floor(Math.random() * (maxValue - minValue + 1) + minValue);
-  return new Date(timestamp).toISOString().split("T")[0];
-};
-
 const getTypeSpecificData = (type: DeviationType, index: number) => {
   const now = new Date();
   const sixMonthsAgo = new Date(now);
@@ -248,25 +267,6 @@ const getTypeSpecificData = (type: DeviationType, index: number) => {
   }
 };
 
-const getDeviationDescription = (type: DeviationType, data: any) => {
-  switch (type) {
-    case "registration":
-      return `Request to change registration date from ${data.originalRegistrationDate} to ${data.proposedRegistrationDate}`;
-    case "possession":
-      return `Request to change possession date from ${data.originalPossessionDate} to ${data.requestedPossessionDate}`;
-    case "interest_waiver":
-      return `Request for interest waiver of ₹${data.interestWaiverRequested} against charged amount of ₹${data.interestCharged}`;
-    case "cashback":
-      return `Request for additional cashback of ₹${data.requestedCashbackAmount - data.eligibleCashbackAmount} over eligible amount`;
-    case "pre_emi":
-      return `Request for ${data.requestedSupport} due to ${data.issueInRepayment}`;
-    case "cancellation":
-      return `Requesting full refund of ₹${data.refundAmountRequested} against policy amount of ₹${data.refundAmountAsPerPolicy}`;
-    default:
-      return "";
-  }
-};
-
 export const generateMockData = (): DeviationRequest[] => {
   const mockRequests: DeviationRequest[] = [];
 
@@ -277,7 +277,10 @@ export const generateMockData = (): DeviationRequest[] => {
     const updatedAt = new Date(Date.now() - i * 12 * 60 * 60 * 1000).toISOString();
     
     const approvers = generateApprovers(type);
-    const currentLevel = status === "approved" ? approvers.length : status === "rejected" ? approvers.findIndex(a => a.status === "rejected") + 1 : 1;
+    // Fix the comparison for rejected status by using type check instead of value equality
+    const currentLevel = status === "approved" ? approvers.length : 
+                         status === "rejected" ? 
+                         (approvers.findIndex(a => a.status === "rejected") + 1) || 1 : 1;
     
     const customerName = customerNames[i % customerNames.length];
     const unitNumber = `A-${100 + i}`;
@@ -305,43 +308,4 @@ export const generateMockData = (): DeviationRequest[] => {
   }
 
   return mockRequests;
-};
-
-const customerNames = [
-  "Rajesh Kumar",
-  "Preeti Shah",
-  "Abdul Karim",
-  "Lakshmi Nair",
-  "John Smith",
-  "Ananya Malhotra",
-  "Vivek Chauhan",
-  "Leela Krishnan",
-  "Suresh Patel",
-  "Fatima Ahmed",
-];
-
-const getRandomDate = (startDate: Date, endDate: Date) => {
-  const minValue = startDate.getTime();
-  const maxValue = endDate.getTime();
-  const timestamp = Math.floor(Math.random() * (maxValue - minValue + 1) + minValue);
-  return new Date(timestamp).toISOString().split("T")[0];
-};
-
-const getDeviationDescription = (type: DeviationType, data: any) => {
-  switch (type) {
-    case "registration":
-      return `Request to change registration date from ${data.originalRegistrationDate} to ${data.proposedRegistrationDate}`;
-    case "possession":
-      return `Request to change possession date from ${data.originalPossessionDate} to ${data.requestedPossessionDate}`;
-    case "interest_waiver":
-      return `Request for interest waiver of ₹${data.interestWaiverRequested} against charged amount of ₹${data.interestCharged}`;
-    case "cashback":
-      return `Request for additional cashback of ₹${data.requestedCashbackAmount - data.eligibleCashbackAmount} over eligible amount`;
-    case "pre_emi":
-      return `Request for ${data.requestedSupport} due to ${data.issueInRepayment}`;
-    case "cancellation":
-      return `Requesting full refund of ₹${data.refundAmountRequested} against policy amount of ₹${data.refundAmountAsPerPolicy}`;
-    default:
-      return "";
-  }
 };
