@@ -1,35 +1,38 @@
 
 import React from "react";
 import { z } from "zod";
-import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import DeviationFormBase from "./DeviationFormBase";
-import CommonDeviationFields from "./CommonDeviationFields";
 import DateField from "./DateField";
+import SelectField from "./SelectField";
 
 const possessionSchema = z.object({
-  customerName: z.string().min(1, "Customer name is required"),
-  unitNumber: z.string().min(1, "Unit number is required"),
   originalPossessionDate: z.date({
     required_error: "Original possession date is required",
   }),
   requestedPossessionDate: z.date({
     required_error: "Requested possession date is required",
   }),
-  paymentDuesStatus: z.string({
-    required_error: "Payment dues status is required",
+  reason: z.string({
+    required_error: "Reason is required",
   }),
   description: z.string().optional(),
 });
 
 const defaultValues = {
-  customerName: "",
-  unitNumber: "",
   originalPossessionDate: undefined,
   requestedPossessionDate: undefined,
-  paymentDuesStatus: "",
+  reason: "",
   description: "",
 };
+
+const reasonOptions = [
+  { value: "construction_delay", label: "Construction Delay" },
+  { value: "force_majeure", label: "Force Majeure" },
+  { value: "regulatory_issues", label: "Regulatory Issues" },
+  { value: "material_shortage", label: "Material Shortage" },
+  { value: "weather_conditions", label: "Adverse Weather Conditions" },
+  { value: "other", label: "Other" }
+];
 
 const PossessionDeviationForm = () => {
   return (
@@ -46,34 +49,28 @@ const PossessionDeviationForm = () => {
           </p>
         </div>
 
-        <CommonDeviationFields />
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <DateField name="originalPossessionDate" label="Original Possession Date" />
           <DateField name="requestedPossessionDate" label="Requested Possession Date" />
-          
-          <FormField
-            name="paymentDuesStatus"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Payment Dues Status</FormLabel>
-                <Select onValueChange={field.onChange} defaultValue={field.value}>
-                  <FormControl>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select payment status" />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    <SelectItem value="Fully Paid">Fully Paid</SelectItem>
-                    <SelectItem value="90% Paid">90% Paid</SelectItem>
-                    <SelectItem value="75% Paid">75% Paid</SelectItem>
-                    <SelectItem value="50% Paid">50% Paid</SelectItem>
-                    <SelectItem value="Less than 50% Paid">Less than 50% Paid</SelectItem>
-                  </SelectContent>
-                </Select>
-                <FormMessage />
-              </FormItem>
-            )}
+        </div>
+        
+        <SelectField 
+          name="reason" 
+          label="Reason for Deviation" 
+          options={reasonOptions}
+          placeholder="Select reason"
+        />
+        
+        <div className="space-y-2">
+          <label htmlFor="description" className="block text-sm font-medium text-gray-700">
+            Additional Notes
+          </label>
+          <textarea
+            id="description"
+            name="description"
+            rows={4}
+            className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+            placeholder="Provide any additional details about this request"
           />
         </div>
       </div>

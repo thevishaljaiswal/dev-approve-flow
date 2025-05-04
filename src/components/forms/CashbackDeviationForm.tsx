@@ -4,12 +4,9 @@ import { z } from "zod";
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import DeviationFormBase from "./DeviationFormBase";
-import CommonDeviationFields from "./CommonDeviationFields";
 import DateField from "./DateField";
 
 const cashbackSchema = z.object({
-  customerName: z.string().min(1, "Customer name is required"),
-  unitNumber: z.string().min(1, "Unit number is required"),
   eligibleCashbackAmount: z.coerce.number().min(0, "Eligible cashback amount is required"),
   requestedCashbackAmount: z.coerce.number().min(0, "Requested cashback amount is required"),
   proposedDate: z.date({
@@ -19,8 +16,6 @@ const cashbackSchema = z.object({
 });
 
 const defaultValues = {
-  customerName: "",
-  unitNumber: "",
   eligibleCashbackAmount: 0,
   requestedCashbackAmount: 0,
   proposedDate: undefined,
@@ -41,8 +36,6 @@ const CashbackDeviationForm = () => {
             Use this form to request additional cashback beyond the eligible amount.
           </p>
         </div>
-
-        <CommonDeviationFields />
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <FormField
@@ -73,6 +66,23 @@ const CashbackDeviationForm = () => {
           
           <DateField name="proposedDate" label="Proposed Cashback Date" />
         </div>
+        
+        <FormField
+          name="description"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Additional Notes</FormLabel>
+              <FormControl>
+                <Textarea
+                  placeholder="Provide any additional details about this request"
+                  className="min-h-[100px]"
+                  {...field}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
       </div>
     </DeviationFormBase>
   );

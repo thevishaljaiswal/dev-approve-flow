@@ -4,12 +4,9 @@ import { z } from "zod";
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import DeviationFormBase from "./DeviationFormBase";
-import CommonDeviationFields from "./CommonDeviationFields";
 import DateField from "./DateField";
 
 const preEmiSchema = z.object({
-  customerName: z.string().min(1, "Customer name is required"),
-  unitNumber: z.string().min(1, "Unit number is required"),
   loanDisbursedDate: z.date({
     required_error: "Loan disbursed date is required",
   }),
@@ -25,8 +22,6 @@ const preEmiSchema = z.object({
 });
 
 const defaultValues = {
-  customerName: "",
-  unitNumber: "",
   loanDisbursedDate: undefined,
   emiStartDate: undefined,
   paymentHistory: "",
@@ -49,8 +44,6 @@ const PreEmiDeviationForm = () => {
             Use this form to request changes or support related to EMI or rental payments.
           </p>
         </div>
-
-        <CommonDeviationFields />
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <DateField name="loanDisbursedDate" label="Loan Disbursed Date" />
@@ -129,6 +122,23 @@ const PreEmiDeviationForm = () => {
             )}
           />
         </div>
+        
+        <FormField
+          name="description"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Additional Notes</FormLabel>
+              <FormControl>
+                <Textarea
+                  placeholder="Provide any additional details about this request"
+                  className="min-h-[100px]"
+                  {...field}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
       </div>
     </DeviationFormBase>
   );

@@ -6,11 +6,8 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import DeviationFormBase from "./DeviationFormBase";
-import CommonDeviationFields from "./CommonDeviationFields";
 
 const interestWaiverSchema = z.object({
-  customerName: z.string().min(1, "Customer name is required"),
-  unitNumber: z.string().min(1, "Unit number is required"),
   overdueAmount: z.coerce.number().min(1, "Overdue amount is required"),
   interestCharged: z.coerce.number().min(0, "Interest charged is required"),
   interestWaiverRequested: z.coerce.number().min(0, "Interest waiver amount is required"),
@@ -23,8 +20,6 @@ const interestWaiverSchema = z.object({
 });
 
 const defaultValues = {
-  customerName: "",
-  unitNumber: "",
   overdueAmount: 0,
   interestCharged: 0,
   interestWaiverRequested: 0,
@@ -47,8 +42,6 @@ const InterestWaiverDeviationForm = () => {
             Use this form to request a waiver on interest charges.
           </p>
         </div>
-
-        <CommonDeviationFields />
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <FormField
@@ -138,6 +131,23 @@ const InterestWaiverDeviationForm = () => {
             )}
           />
         </div>
+        
+        <FormField
+          name="description"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Additional Notes</FormLabel>
+              <FormControl>
+                <Textarea
+                  placeholder="Provide any additional details about this request"
+                  className="min-h-[100px]"
+                  {...field}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
       </div>
     </DeviationFormBase>
   );

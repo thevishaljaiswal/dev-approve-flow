@@ -2,15 +2,10 @@
 import React from "react";
 import { z } from "zod";
 import DeviationFormBase from "./DeviationFormBase";
-import CommonDeviationFields from "./CommonDeviationFields";
 import DateField from "./DateField";
+import SelectField from "./SelectField";
 
 const registrationSchema = z.object({
-  customerName: z.string().min(1, "Customer name is required"),
-  unitNumber: z.string().min(1, "Unit number is required"),
-  bookingDate: z.date({
-    required_error: "Booking date is required",
-  }),
   originalRegistrationDate: z.date({
     required_error: "Original registration date is required",
   }),
@@ -20,17 +15,27 @@ const registrationSchema = z.object({
     (date) => date > new Date(),
     "Proposed registration date must be in the future"
   ),
+  reason: z.string({
+    required_error: "Reason is required",
+  }),
   description: z.string().optional(),
 });
 
 const defaultValues = {
-  customerName: "",
-  unitNumber: "",
-  bookingDate: undefined,
   originalRegistrationDate: undefined,
   proposedRegistrationDate: undefined,
+  reason: "",
   description: "",
 };
+
+const reasonOptions = [
+  { value: "document_delay", label: "Document Delay" },
+  { value: "bank_process_delay", label: "Bank Processing Delay" },
+  { value: "customer_request", label: "Customer Request" },
+  { value: "legal_issue", label: "Legal Issue" },
+  { value: "technical_error", label: "Technical Error" },
+  { value: "other", label: "Other" }
+];
 
 const RegistrationDeviationForm = () => {
   return (
@@ -47,12 +52,29 @@ const RegistrationDeviationForm = () => {
           </p>
         </div>
 
-        <CommonDeviationFields />
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <DateField name="bookingDate" label="Booking Date" />
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <DateField name="originalRegistrationDate" label="Original Registration Date" />
           <DateField name="proposedRegistrationDate" label="Proposed Registration Date" />
+        </div>
+        
+        <SelectField 
+          name="reason" 
+          label="Reason for Deviation" 
+          options={reasonOptions}
+          placeholder="Select reason"
+        />
+        
+        <div className="space-y-2">
+          <label htmlFor="description" className="block text-sm font-medium text-gray-700">
+            Additional Notes
+          </label>
+          <textarea
+            id="description"
+            name="description"
+            rows={4}
+            className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+            placeholder="Provide any additional details about this request"
+          />
         </div>
       </div>
     </DeviationFormBase>

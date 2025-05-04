@@ -5,12 +5,10 @@ import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/comp
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Textarea } from "@/components/ui/textarea";
 import DeviationFormBase from "./DeviationFormBase";
-import CommonDeviationFields from "./CommonDeviationFields";
 
 const cancellationSchema = z.object({
-  customerName: z.string().min(1, "Customer name is required"),
-  unitNumber: z.string().min(1, "Unit number is required"),
   reasonForCancellation: z.string().min(1, "Reason for cancellation is required"),
   refundAmountAsPerPolicy: z.coerce.number().min(0, "Refund amount as per policy is required"),
   refundAmountRequested: z.coerce.number().min(0, "Refund amount requested is required"),
@@ -19,8 +17,6 @@ const cancellationSchema = z.object({
 });
 
 const defaultValues = {
-  customerName: "",
-  unitNumber: "",
   reasonForCancellation: "",
   refundAmountAsPerPolicy: 0,
   refundAmountRequested: 0,
@@ -49,8 +45,6 @@ const CancellationDeviationForm = () => {
             Use this form to request booking cancellation and refund adjustment.
           </p>
         </div>
-
-        <CommonDeviationFields />
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <FormField
@@ -138,6 +132,23 @@ const CancellationDeviationForm = () => {
                   </div>
                 ))}
               </div>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        
+        <FormField
+          name="description"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Additional Notes</FormLabel>
+              <FormControl>
+                <Textarea
+                  placeholder="Provide any additional details about this request"
+                  className="min-h-[100px]"
+                  {...field}
+                />
+              </FormControl>
               <FormMessage />
             </FormItem>
           )}
