@@ -3,6 +3,7 @@ import React from "react";
 import { z } from "zod";
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
 import DeviationFormBase from "./DeviationFormBase";
 import DateField from "./DateField";
 
