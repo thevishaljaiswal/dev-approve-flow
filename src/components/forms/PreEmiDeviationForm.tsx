@@ -6,6 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Textarea } from "@/components/ui/textarea";
 import DeviationFormBase from "./DeviationFormBase";
 import DateField from "./DateField";
+import SelectField from "./SelectField";
 
 const preEmiSchema = z.object({
   loanDisbursedDate: z.date({
@@ -13,6 +14,9 @@ const preEmiSchema = z.object({
   }),
   emiStartDate: z.date({
     required_error: "EMI start date is required",
+  }),
+  monthYear: z.string({
+    required_error: "Month and year are required",
   }),
   paymentHistory: z.string({
     required_error: "Payment history is required",
@@ -25,6 +29,7 @@ const preEmiSchema = z.object({
 const defaultValues = {
   loanDisbursedDate: undefined,
   emiStartDate: undefined,
+  monthYear: "",
   paymentHistory: "",
   issueInRepayment: "",
   requestedSupport: "",
@@ -32,6 +37,31 @@ const defaultValues = {
 };
 
 const PreEmiDeviationForm = () => {
+  // Generate month-year options for the last 2 years and next 1 year
+  const generateMonthYearOptions = () => {
+    const options = [];
+    const currentDate = new Date();
+    const currentYear = currentDate.getFullYear();
+    const currentMonth = currentDate.getMonth();
+    
+    // Add options for the past 2 years
+    for (let y = currentYear - 2; y <= currentYear + 1; y++) {
+      const startMonth = y === currentYear - 2 ? currentMonth : 0;
+      const endMonth = y === currentYear + 1 ? currentMonth : 11;
+      
+      for (let m = startMonth; m <= endMonth; m++) {
+        const monthNames = ["January", "February", "March", "April", "May", "June", 
+                          "July", "August", "September", "October", "November", "December"];
+        const value = `${monthNames[m]}-${y}`;
+        options.push({ value, label: value });
+      }
+    }
+    
+    return options;
+  };
+
+  const monthYearOptions = generateMonthYearOptions();
+
   return (
     <DeviationFormBase
       schema={preEmiSchema}
@@ -52,6 +82,13 @@ const PreEmiDeviationForm = () => {
         </div>
 
         <div className="grid grid-cols-1 gap-6">
+          <SelectField 
+            name="monthYear"
+            label="Month and Year"
+            placeholder="Select month and year"
+            options={monthYearOptions}
+          />
+
           <FormField
             name="paymentHistory"
             render={({ field }) => (
