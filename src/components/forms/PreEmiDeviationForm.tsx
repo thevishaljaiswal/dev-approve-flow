@@ -4,9 +4,14 @@ import { z } from "zod";
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Button } from "@/components/ui/button";
+import { Calendar } from "@/components/ui/calendar";
+import { CalendarIcon } from "lucide-react";
+import { format } from "date-fns";
+import { cn } from "@/lib/utils";
 import DeviationFormBase from "./DeviationFormBase";
 import DateField from "./DateField";
-import SelectField from "./SelectField";
 
 const preEmiSchema = z.object({
   loanDisbursedDate: z.date({
@@ -15,7 +20,7 @@ const preEmiSchema = z.object({
   emiStartDate: z.date({
     required_error: "EMI start date is required",
   }),
-  monthYear: z.string({
+  monthYear: z.date({
     required_error: "Month and year are required",
   }),
   paymentHistory: z.string({
@@ -29,7 +34,7 @@ const preEmiSchema = z.object({
 const defaultValues = {
   loanDisbursedDate: undefined,
   emiStartDate: undefined,
-  monthYear: "",
+  monthYear: undefined,
   paymentHistory: "",
   issueInRepayment: "",
   requestedSupport: "",
@@ -37,31 +42,6 @@ const defaultValues = {
 };
 
 const PreEmiDeviationForm = () => {
-  // Generate month-year options for the last 2 years and next 1 year
-  const generateMonthYearOptions = () => {
-    const options = [];
-    const currentDate = new Date();
-    const currentYear = currentDate.getFullYear();
-    const currentMonth = currentDate.getMonth();
-    
-    // Add options for the past 2 years
-    for (let y = currentYear - 2; y <= currentYear + 1; y++) {
-      const startMonth = y === currentYear - 2 ? currentMonth : 0;
-      const endMonth = y === currentYear + 1 ? currentMonth : 11;
-      
-      for (let m = startMonth; m <= endMonth; m++) {
-        const monthNames = ["January", "February", "March", "April", "May", "June", 
-                          "July", "August", "September", "October", "November", "December"];
-        const value = `${monthNames[m]}-${y}`;
-        options.push({ value, label: value });
-      }
-    }
-    
-    return options;
-  };
-
-  const monthYearOptions = generateMonthYearOptions();
-
   return (
     <DeviationFormBase
       schema={preEmiSchema}
@@ -82,11 +62,50 @@ const PreEmiDeviationForm = () => {
         </div>
 
         <div className="grid grid-cols-1 gap-6">
-          <SelectField 
+          <FormField
             name="monthYear"
-            label="Month and Year"
-            placeholder="Select month and year"
-            options={monthYearOptions}
+            render={({ field }) => (
+              <FormItem className="flex flex-col">
+                <FormLabel>Month and Year</FormLabel>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <FormControl>
+                      <Button
+                        variant="outline"
+                        className={cn(
+                          "w-full pl-3 text-left font-normal",
+                          !field.value && "text-muted-foreground"
+                        )}
+                      >
+                        {field.value ? (
+                          format(field.value, "MMMM yyyy")
+                        ) : (
+                          <span>Select month and year</span>
+                        )}
+                        <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                      </Button>
+                    </FormControl>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <Calendar
+                      mode="single"
+                      selected={field.value}
+                      onSelect={field.onChange}
+                      initialFocus
+                      className={cn("p-3 pointer-events-auto")}
+                      captionLayout="dropdown-buttons"
+                      fromYear={new Date().getFullYear() - 2}
+                      toYear={new Date().getFullYear() + 1}
+                      disabled={(date) => {
+                        // Only enable the first day of each month for selection
+                        return date.getDate() !== 1;
+                      }}
+                    />
+                  </PopoverContent>
+                </Popover>
+                <FormMessage />
+              </FormItem>
+            )}
           />
 
           <FormField
